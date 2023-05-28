@@ -1,13 +1,17 @@
-package main
+package exercicio2
 
 import (
 	"errors"
 	"fmt"
 )
 
-func main() {
+/*Um colégio precisa calcular a média das notas (por aluno). Precisamos criar uma função na
+qual possamos passar N quantidade de números inteiros e devolva a média.
+Obs: Caso um dos números digitados seja negativo, a aplicação deve retornar um erro*/
+
+func Exercicio2() {
 	//Calcular media das notas por aluno, possamos passar n quantidade de inteiros e devolver media, caso seja negativo, retornar erro
-	resultado, erro := calculaMedia(2, 2, 4, -5)
+	resultado, erro := calculaMedia(2, 2, 4, 5, 10)
 	if erro != nil {
 		fmt.Println("Houve um erro, resultado: ", resultado, erro.Error())
 	} else {
