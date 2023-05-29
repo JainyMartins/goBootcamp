@@ -33,8 +33,13 @@ tenha)
 - Deve possuir o método “Adicionar”, onde o mesmo deve receber um novo produto
 e adicioná-lo a lista da loja*/
 
-type loja struct {
-	produtos []produto
+type Produto interface {
+	CalcularCusto() float64
+}
+
+type Ecommerce interface {
+	Total() float64
+	Adicionar(Produto)
 }
 
 type produto struct {
@@ -44,47 +49,46 @@ type produto struct {
 }
 
 func (p produto) CalcularCusto() float64 {
+	var custoAdicional float64
 	switch {
 	case p.tipoProduto == "pequeno":
-		return p.preco
+		custoAdicional = 0.0
 	case p.tipoProduto == "medio":
-		return p.preco * 1.03
+		custoAdicional = p.preco * 0.03
 	case p.tipoProduto == "grande":
-		return p.preco*1.06 + 2500.0
+		custoAdicional = p.preco*0.06 + 2500.0
 	default:
-		return p.preco
+		custoAdicional = 0.0
+	}
+	return p.preco + custoAdicional
+}
+
+type loja struct {
+	Produtos []Produto
+}
+
+func (l loja) Total() float64 {
+	var total float64
+	for _, produto := range l.Produtos {
+		total += produto.CalcularCusto()
+	}
+	return total
+}
+
+func (l *loja) Adicionar(produto Produto) {
+	l.Produtos = append(l.Produtos, produto)
+}
+
+func novoProduto(tipoProduto, nome string, preco float64) Produto {
+	return produto{
+		tipoProduto: tipoProduto,
+		nome:        nome,
+		preco:       preco,
 	}
 }
 
-type Produto interface {
-	CalcularCusto()
-}
-
-type Ecommerce interface {
-	Total()
-	Adicionar()
-}
-
-func (l loja) Total(loja loja) float64 {
-	soma := 0.0
-	valorProduto := 0.0
-	for _, valor := range loja.produtos {
-		valorProduto = valor.CalcularCusto()
-		soma += valorProduto
-	}
-	return soma
-}
-
-func (c *loja) Adicionar(produto produto) {
-	c.produtos = append(c.produtos, produto)
-}
-
-func novoProduto(tipoProduto, nome string, preco float64) produto {
-	return produto{tipoProduto: tipoProduto, nome: nome, preco: preco}
-}
-
-func novaLoja() loja {
-	return loja{}
+func novaLoja() Ecommerce {
+	return &loja{}
 }
 
 func Exercicio2() {
@@ -96,6 +100,6 @@ func Exercicio2() {
 	loja := novaLoja()
 	loja.Adicionar(novoProduto("pequeno", "morango", 9.9))
 	loja.Adicionar(novoProduto("grande", "tv", 1050.9))
-	fmt.Println(loja.Total(loja))
+	fmt.Printf("Total da loja: R$%.2f\n", loja.Total())
 	fmt.Println(loja)
 }
